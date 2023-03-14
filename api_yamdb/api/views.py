@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
-from .models import Review, Title
+from reviews.models import Review, Title
 from .serializers import CommentSerializer, ReviewSerializer
 
 
@@ -14,8 +14,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_queryset())
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -27,5 +26,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         return review.comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        serializer.save(author=self.request.user, review=review)
+        serializer.save(author=self.request.user, review=self.get_queryset())

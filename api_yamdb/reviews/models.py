@@ -22,13 +22,13 @@ class Review(models.Model):
         'Оценка',
         validators=(
             MinValueValidator(1),
-            MaxValueValidator(10)
+            MaxValueValidator(10),
         ),
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
 
     class Meta:
