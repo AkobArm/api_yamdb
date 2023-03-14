@@ -2,12 +2,8 @@ from django.shortcuts import render
 from rest_framework import viewsets
 
 from .models import Category, Genre, Title, User
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer # Сериализаторы в процессе работы
-    permission_classes = ...
+from .serializers import (CategorySerializer, GenreSerializer, TitleSerializer,
+                          UserSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
