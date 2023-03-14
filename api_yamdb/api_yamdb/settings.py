@@ -101,3 +101,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+
+FIELDS = (
+    'username',
+    'email',
+    'first_name',
+    'last_name',
+    'bio',
+    'role',
+)
