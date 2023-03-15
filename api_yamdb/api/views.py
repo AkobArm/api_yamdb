@@ -14,7 +14,10 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Review, Title, Category, Genre
 from users.models import User
 
-from .permissions import OwnerOrAdmins, IsAdminOrReadOnly, AuthorAndStaffOrReadOnly
+from .permissions import (OwnerOrAdmins,
+                          IsAdminOrReadOnly,
+                          AuthorAndStaffOrReadOnly)
+
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, MeSerializer, ReviewSerializer,
                           SignUpSerializer, TitleSerializer, TokenSerializer,
@@ -36,11 +39,15 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-id')
     serializer_class = CategorySerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name',)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all().order_by('-id')
     serializer_class = GenreSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
