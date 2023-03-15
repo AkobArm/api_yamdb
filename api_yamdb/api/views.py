@@ -1,23 +1,46 @@
-from django.shortcuts import get_object_or_404
-
 import uuid
 
 from django.core.mail import send_mail
-
 from django.db import IntegrityError
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action, api_view
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from .models import User
-from .permissions import OwnerOrAdmins
-from .serializers import (
-    SignUpSerializer, TokenSerializer,
-    UserSerializer, MeSerializer)
 from reviews.models import Review, Title
-from .serializers import CommentSerializer, ReviewSerializer
+
+from .models import Category, Genre, Title, User
+from .permissions import OwnerOrAdmins
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, MeSerializer, ReviewSerializer,
+                          SignUpSerializer, TitleSerializer, TokenSerializer,
+                          UserSerializer)
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
+    serializer_class = TitleSerializer
+    permission_classes = ...
+    filter_backends = (DjangoFilterBackend)
+    filterset_fields = (
+        'category',
+        'genre',
+        'name',
+        'year',)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all().order_by('-id')
+    serializer_class = CategorySerializer
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all().order_by('-id')
+    serializer_class = GenreSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
