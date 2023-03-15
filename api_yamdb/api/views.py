@@ -16,8 +16,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         'category',
         'genre',
         'name',
-        'year',
-        )
+        'year',)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
