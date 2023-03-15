@@ -37,8 +37,7 @@ class Title(models.Model):
                                    verbose_name='описание',
                                    blank=True,
                                    null=True)
-    rating = models.IntegerField(
-        null=True)
+    rating = models.IntegerField(null=True)
     year = models.IntegerField(verbose_name='год выпуска произведения')
     genre = models.ManyToManyField(Genre,
                                    blank=True,
