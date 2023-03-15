@@ -1,7 +1,6 @@
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 
 from .models import Category, Genre, Title

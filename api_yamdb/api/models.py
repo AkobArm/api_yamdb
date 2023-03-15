@@ -69,7 +69,7 @@ class GenreTitle(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'genre'], name='unique_GenreTitle'
+                fields=['title', 'genre'], name='GenreTitle'
             ),
         ]
 
