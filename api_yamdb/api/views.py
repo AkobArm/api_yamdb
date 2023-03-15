@@ -12,6 +12,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = ...
     filter_backends = (DjangoFilterBackend)
+    filterset_fields = (
+        'category',
+        'genre',
+        'name',
+        'year',
+        'rating',
+        )
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

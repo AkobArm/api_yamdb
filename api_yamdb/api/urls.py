@@ -6,9 +6,9 @@ router = DefaultRouter()
 
 app_name = 'api'
 
-router.register(r'titles', TitleViewSet, basename='titles')
-router.register(r'genres', GenreViewSet, basename='genres')
-router.register(r'categories', CategoryViewSet, basename='categories')
+router.register(r'titles', TitleViewSet, basename='TitleViewSet')
+router.register(r'genres', GenreViewSet, basename='GenreViewSet')
+router.register(r'categories', CategoryViewSet, basename='CategoryViewSet')
 
 urlpatterns = [
     path('v1/', include(router.urls)),
