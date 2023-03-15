@@ -74,3 +74,4 @@ class GenreTitle(models.Model):
 
     def __str__(self):
         return f'Произведение:{self.title} жанр: {self.genre}'
+
