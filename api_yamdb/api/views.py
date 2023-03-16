@@ -14,7 +14,10 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Review, Title, Category, Genre
 from users.models import User
 
-from .permissions import OwnerOrAdmins
+from .permissions import (OwnerOrAdmins,
+                          IsAdminOrReadOnly,
+                          AuthorAndStaffOrReadOnly)
+
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, MeSerializer, ReviewSerializer,
                           SignUpSerializer, TitleSerializer, TokenSerializer,
@@ -24,7 +27,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     serializer_class = TitleSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = (
         'category',
@@ -36,16 +39,20 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-id')
     serializer_class = CategorySerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name',)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all().order_by('-id')
     serializer_class = GenreSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('name',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AuthorAndStaffOrReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -57,7 +64,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AuthorAndStaffOrReadOnly]
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
