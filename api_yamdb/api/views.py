@@ -7,21 +7,20 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Review, Title, Category, Genre
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
-from .permissions import (OwnerOrAdmins,
-                          IsAdminOrReadOnly,
-                          AuthorAndStaffOrReadOnly)
-
+from .permissions import (AuthorAndStaffOrReadOnly, IsAdminOrReadOnly,
+                          OwnerOrAdmins)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, MeSerializer, ReviewSerializer,
                           SignUpSerializer, TitleSerializer, TokenSerializer,
-                          UserSerializer)
+                          UserSerializer, TitleGetSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -35,19 +34,46 @@ class TitleViewSet(viewsets.ModelViewSet):
         'name',
         'year',)
 
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH'):
+            return TitleSerializer
+        return TitleGetSerializer
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all().order_by('-id')
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_fields = ('name',)
+    permission_classes = [IsAdminOrReadOnly, ]
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filterset_fields = ('name', 'slug')
+    search_fields = ('name', 'slug',)
+    lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        """Проверка на получение данных"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        """Проверка на изменение данных"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    queryset = Genre.objects.all().order_by('-id')
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_fields = ('name',)
+    permission_classes = [IsAdminOrReadOnly, ]
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filterset_fields = ('name', 'slug')
+    search_fields = ('name', 'slug')
+    lookup_field = 'slug'
+
+    def retrieve(self, request, *args, **kwargs):
+        """Проверка на получение данных"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        """Проверка на изменение данных"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

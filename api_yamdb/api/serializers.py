@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from django.db.models import Avg
 
 from reviews.models import Category, Genre, Title, Comment, Review
 from users.models import User
@@ -8,15 +9,14 @@ from users.models import User
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
+        exclude = ('id',)
         model = Category
-        fields = ['name', 'slug']
-        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
+        exclude = ('id',)
         model = Genre
-        fields = ['name', 'slug']
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -37,6 +37,20 @@ class TitleSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'category', 'genre', 'rating', 'description')
         read_only_fields = ('id', 'name', 'year',
                             'category', 'genre', 'rating', 'description')
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    category = CategorySerializer()
+    genre = GenreSerializer(many=True)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score', default=0))
+        return rating.get('score__avg')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
