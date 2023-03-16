@@ -2,7 +2,9 @@ from django.core.exceptions import ValidationError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
 from reviews.models import Category, Comment, Genre, Review, Title
+
 from users.models import User
 
 
@@ -45,6 +47,20 @@ class TitleGetSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Title
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score', default=0))
+        return rating.get('score__avg')
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    category = CategorySerializer()
+    genre = GenreSerializer(many=True)
+
+    class Meta:
+        model = Title
+        fields = '__all__'
 
     def get_rating(self, obj):
         rating = obj.reviews.aggregate(Avg('score', default=0))

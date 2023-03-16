@@ -24,6 +24,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleSerializer, TokenSerializer, UserSerializer)
 
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     permission_classes = [IsAdminOrReadOnly]
@@ -33,6 +34,11 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
+            return TitleSerializer
+        return TitleGetSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in ('POST', 'PATCH'):
             return TitleSerializer
         return TitleGetSerializer
 
