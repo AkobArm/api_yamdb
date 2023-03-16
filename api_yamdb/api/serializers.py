@@ -1,9 +1,10 @@
 from django.core.exceptions import ValidationError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from django.db.models import Avg
 
-from reviews.models import Category, Genre, Title, Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title
+
 from users.models import User
 
 
@@ -27,16 +28,29 @@ class TitleSerializer(serializers.ModelSerializer):
     )
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
-        slug_field='slug'
+        slug_field='slug',
     )
-    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
+        fields = '__all__'
         model = Title
-        fields = (
-            'id', 'name', 'year', 'category', 'genre', 'rating', 'description')
-        read_only_fields = ('id', 'name', 'year',
-                            'category', 'genre', 'rating', 'description')
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True,
+    )
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+    def get_rating(self, obj):
+        rating = obj.reviews.aggregate(Avg('score', default=0))
+        return rating.get('score__avg')
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
@@ -56,11 +70,11 @@ class TitleGetSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     title = serializers.SlugRelatedField(
         slug_field='name',
-        read_only=True
+        read_only=True,
     )
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True
+        read_only=True,
     )
 
     def validate_score(self, value):
@@ -86,7 +100,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
@@ -124,7 +138,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'bio',
-            'role'
+            'role',
         )
 
 
@@ -139,5 +153,5 @@ class MeSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'bio',
-            'role'
+            'role',
         )
