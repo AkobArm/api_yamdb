@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
-
+from users.validators import UsernameValidator
 from users.models import User
 
 
@@ -110,7 +110,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254, required=True)
-    username = serializers.CharField(max_length=150, required=True)
+    username = serializers.CharField(max_length=150, required=True,
+                                     validators=[UsernameValidator(), ])
 
     def validate(self, data):
         if data['username'] == 'me':
