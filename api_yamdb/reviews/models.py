@@ -1,6 +1,5 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from users.models import User
 
 SIM_NUMB: int = 15
@@ -38,20 +37,20 @@ class Title(models.Model):
     """Модель произведения"""
     name = models.CharField(max_length=200,
                             verbose_name='название произведения')
-    description = models.CharField(max_length=250,
+    description = models.TextField(max_length=250,
                                    verbose_name='описание',
-                                   blank=True,
-                                   null=True)
+                                   blank=True)
     year = models.IntegerField(verbose_name='год выпуска произведения')
     genre = models.ManyToManyField(Genre,
                                    blank=True,
+                                   related_name='titles',
                                    verbose_name='Жанр')
     category = models.ForeignKey(
-        Category, related_name='title', blank=True, null=True,
+        Category, related_name='titles', blank=True, null=True,
         on_delete=models.SET_NULL)
 
     class Meta:
-        ordering = ('-year',)
+        ordering = ('name',)
         verbose_name = 'Произведение'
 
     def __str__(self):
@@ -81,6 +80,7 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
+    """Модель отзыва"""
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -120,6 +120,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    """Модель комментария"""
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
