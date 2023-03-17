@@ -24,7 +24,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           TitleSerializer, TokenSerializer, UserSerializer)
 
 
-
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score')).all()
     permission_classes = [IsAdminOrReadOnly]
@@ -81,7 +80,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [AuthorAndStaffOrReadOnly]
+    permission_classes = (AuthorAndStaffOrReadOnly, )
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -95,7 +94,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [AuthorAndStaffOrReadOnly]
+    permission_classes = (AuthorAndStaffOrReadOnly, )
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -151,8 +150,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
     permission_classes = (OwnerOrAdmins, )
-    filter_backends = (filters.SearchFilter, )
-    filterset_fields = ('username')
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('username', )
     lookup_field = 'username'
 
