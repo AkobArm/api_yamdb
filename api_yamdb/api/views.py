@@ -155,7 +155,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
 
     @action(
-        methods=['get', 'patch'],
+        methods=['get', 'patch', 'put'],
         detail=False,
         url_path='me',
         permission_classes=(IsAuthenticated, )
@@ -170,3 +170,13 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = UserSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        if request.method == 'PUT':
+            return Response(serializer.data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
