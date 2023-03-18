@@ -16,6 +16,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 from .paginator import CommentPagination
+from abc import ABC, abstractmethod
 
 from .permissions import AuthorAndStaffOrReadOnly, IsAdminOrReadOnly, OwnerOrAdmins
 from .serializers import (
@@ -50,7 +51,17 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleGetSerializer
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class AbstractViewSet(viewsets.ModelViewSet, ABC):
+    @abstractmethod
+    def retrieve(self, request, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def update(self, request, *args, **kwargs):
+        pass
+
+
+class CategoryViewSet(AbstractViewSet):
     queryset = Category.objects.all().order_by("id")
     serializer_class = CategorySerializer
     permission_classes = [
