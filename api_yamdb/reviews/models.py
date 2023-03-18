@@ -1,6 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
+import datetime
 
 SIM_NUMB: int = 15
 
@@ -36,7 +37,10 @@ class Title(models.Model):
 
     name = models.CharField(max_length=200, verbose_name="название произведения")
     description = models.TextField(max_length=250, verbose_name="описание", blank=True)
-    year = models.IntegerField(verbose_name="год выпуска произведения")
+    year = models.PositiveIntegerField(verbose_name='год выпуска произведения',
+                                       validators=[MaxValueValidator
+                                                   (datetime.datetime.now().year)]
+                                       )
     genre = models.ManyToManyField(
         Genre, blank=True, related_name="titles", verbose_name="Жанр"
     )
@@ -85,11 +89,11 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name="reviews",
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         "Оценка",
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10),
+            MinValueValidator(1, message='Оценка не может быть меньше 1'),
+            MaxValueValidator(10, message='Оценка не может быть больше 10'),
         ),
     )
     pub_date = models.DateTimeField(
