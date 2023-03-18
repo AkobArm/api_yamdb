@@ -42,12 +42,10 @@ class TitleGetSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True,
     )
-    rating = serializers.FloatField()
 
     class Meta:
         fields = "__all__"
         model = Title
-        queryset = Title.objects.annotate(rating=Avg("reviews__score"))
 
 
 
