@@ -88,7 +88,7 @@ class CategoryViewSet(AbstractViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(AbstractViewSet):
     queryset = Genre.objects.all().order_by("id")
     serializer_class = GenreSerializer
     permission_classes = [
