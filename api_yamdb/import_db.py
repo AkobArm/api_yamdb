@@ -1,7 +1,10 @@
 import csv
 import os
 
-from users.models import User, Review, Comment, Category, Genre, Title, GenreTitle
+from users.models import (
+    User, Review, Comment,
+    Category, Genre, Title,
+    GenreTitle)
 
 path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(path)

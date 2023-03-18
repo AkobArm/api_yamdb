@@ -48,7 +48,6 @@ class TitleGetSerializer(serializers.ModelSerializer):
         model = Title
 
 
-
 class TitleGetSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField()
     category = CategorySerializer()
