@@ -1,4 +1,5 @@
 import uuid
+from abc import ABC, abstractmethod
 
 from api.filters import TitleFilter
 from django.core.mail import send_mail
@@ -15,9 +16,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
-from .paginator import CommentPagination
-from abc import ABC, abstractmethod
 
+from .paginator import CommentPagination
 from .permissions import (
     AuthorAndStaffOrReadOnly,
     IsAdminOrReadOnly,
