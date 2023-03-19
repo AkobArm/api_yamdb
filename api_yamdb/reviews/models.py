@@ -10,7 +10,8 @@ SIM_NUMB: int = 15
 class Category(models.Model):
     """Модель категории произведения"""
 
-    name = models.CharField(max_length=200, verbose_name="категория произведения")
+    name = models.CharField(max_length=200,
+                            verbose_name="категория произведения")
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -36,8 +37,10 @@ class Genre(models.Model):
 class Title(models.Model):
     """Модель произведения"""
 
-    name = models.CharField(max_length=200, verbose_name="название произведения")
-    description = models.TextField(max_length=250, verbose_name="описание", blank=True)
+    name = models.CharField(max_length=200,
+                            verbose_name="название произведения")
+    description = models.TextField(max_length=250,
+                                   verbose_name="описание", blank=True)
     year = models.PositiveIntegerField(
         verbose_name="год выпуска произведения",
         validators=[validate_year],
@@ -69,7 +72,9 @@ class GenreTitle(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["title", "genre"], name="GenreTitle"),
+            models.UniqueConstraint(
+                fields=["title", "genre"],
+                name="GenreTitle"),
         ]
 
     def __str__(self):
@@ -133,7 +138,9 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name="comments",
     )
-    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField("Дата публикации",
+                                    auto_now_add=True,
+                                    db_index=True)
 
     def __str__(self):
         return self.text[:SIM_NUMB]

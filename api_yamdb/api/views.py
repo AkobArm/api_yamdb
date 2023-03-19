@@ -9,7 +9,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
+from rest_framework.mixins import (
+    CreateModelMixin, DestroyModelMixin,
+    ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,7 +21,10 @@ from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
 from .paginator import CommentPagination
-from .permissions import AuthorAndStaffOrReadOnly, IsAdminOrReadOnly, OwnerOrAdmins
+from .permissions import (
+    AuthorAndStaffOrReadOnly,
+    IsAdminOrReadOnly,
+    OwnerOrAdmins)
 from .serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -153,10 +158,12 @@ def signup_post(request):
     email = serializer.validated_data["email"]
     username = serializer.validated_data["username"]
     try:
-        user, create = User.objects.get_or_create(username=username, email=email)
+        user, create = User.objects.get_or_create(
+            username=username, email=email)
     except IntegrityError:
         return Response(
-            "Такой логин или email уже существуют", status=status.HTTP_400_BAD_REQUEST
+            "Такой логин или email уже существуют",
+            status=status.HTTP_400_BAD_REQUEST
         )
     confirmation_code = str(uuid.uuid4())
     user.confirmation_code = confirmation_code
@@ -206,8 +213,12 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def get_patch_me(self, request):
-        user = get_object_or_404(User, username=self.request.user)
-        serializer_data = {"instance": user, "data": request.data, "partial": False}
+        user = get_object_or_404(User,
+                                 username=self.request.user
+                                 )
+        serializer_data = {"instance": user,
+                           "data": request.data,
+                           "partial": False}
 
         if request.method == "GET":
             serializer = MeSerializer(user)
@@ -224,9 +235,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = UserSerializer(instance, data=request.data, partial=True)
+        serializer = UserSerializer(instance,
+                                    data=request.data,
+                                    partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         if request.method == "PUT":
-            return Response(serializer.data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            return Response(serializer.data,
+                            status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return Response(serializer.data, status=status.HTTP_200_OK)

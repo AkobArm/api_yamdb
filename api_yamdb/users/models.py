@@ -28,7 +28,8 @@ class User(AbstractUser):
         "Роль пользователя", choices=roles, max_length=255, default=USER
     )
     bio = models.TextField("Биография", blank=True)
-    confirmation_code = models.CharField("Код подтверждения", max_length=100, null=True)
+    confirmation_code = models.CharField("Код подтверждения",
+                                         max_length=100, null=True)
 
     REQUIRED_FIELDS = ["email"]
     USERNAME_FIELDS = "email"
