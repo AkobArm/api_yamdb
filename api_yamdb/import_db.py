@@ -5,7 +5,7 @@ from users.models import (
     User, Review, Comment,
     Category, Genre, Title, GenreTitle)
 
-path = "C:\\Users\\User\\Desktop\\api_yamdb\\api_yamdb\\data\\users.csv"
+path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(path)
 
 
