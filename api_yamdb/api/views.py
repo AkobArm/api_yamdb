@@ -1,5 +1,4 @@
 import uuid
-from abc import ABC, abstractmethod
 
 from api.filters import TitleFilter
 from django.core.mail import send_mail
@@ -7,42 +6,37 @@ from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
 from .paginator import CommentPagination
-from .permissions import (
-    AuthorAndStaffOrReadOnly,
-    IsAdminOrReadOnly,
-    OwnerOrAdmins)
-from .serializers import (
-    CategorySerializer,
-    CommentSerializer,
-    GenreSerializer,
-    MeSerializer,
-    ReviewSerializer,
-    SignUpSerializer,
-    TitleGetSerializer,
-    TitleSerializer,
-    TokenSerializer,
-    UserSerializer,
-)
+from .permissions import (AuthorAndStaffOrReadOnly, IsAdminOrReadOnly,
+                          OwnerOrAdmins)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, MeSerializer, ReviewSerializer,
+                          SignUpSerializer, TitleGetSerializer,
+                          TitleSerializer, TokenSerializer, UserSerializer)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=Avg("reviews__score")).all().order_by("id")
+        rating=Avg("reviews__score")).all()
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter,)
     filterset_class = TitleFilter
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):
@@ -55,24 +49,21 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleGetSerializer
 
 
-class AbstractViewSet(viewsets.ModelViewSet, ABC):
-    @abstractmethod
-    def retrieve(self, request, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def update(self, request, *args, **kwargs):
-        pass
+class ModelMixinSet(CreateModelMixin, ListModelMixin,
+                    DestroyModelMixin, GenericViewSet):
+    pass
 
 
-class CategoryViewSet(AbstractViewSet):
-    queryset = Category.objects.all().order_by("id")
+class CategoryViewSet(ModelMixinSet):
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [
         IsAdminOrReadOnly,
     ]
-    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filterset_fields = ("name", "slug")
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
     search_fields = (
         "name",
         "slug",
@@ -88,14 +79,16 @@ class CategoryViewSet(AbstractViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class GenreViewSet(AbstractViewSet):
-    queryset = Genre.objects.all().order_by("id")
+class GenreViewSet(ModelMixinSet):
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [
         IsAdminOrReadOnly,
     ]
-    filter_backends = (DjangoFilterBackend, SearchFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     filterset_fields = ("name", "slug")
+    ordering_fields = ['id', 'name']
+    ordering = ['id']
     search_fields = ("name", "slug")
     lookup_field = "slug"
 
@@ -177,12 +170,14 @@ def token_post(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by("id")
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
     permission_classes = (OwnerOrAdmins,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter,)
     search_fields = ("username",)
+    ordering_fields = ['id', 'username']
+    ordering = ['id']
     lookup_field = "username"
 
     @action(
@@ -193,7 +188,8 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def get_patch_me(self, request):
         user = get_object_or_404(User, username=self.request.user)
-        serializer_data = {'instance': user, 'data': request.data, 'partial': False}
+        serializer_data = {'instance': user, 'data': request.data,
+                           'partial': False}
 
         if request.method == "GET":
             serializer = MeSerializer(user)
