@@ -1,7 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from users.models import User
-import datetime
+
+from .validators import validate_year
 
 SIM_NUMB: int = 15
 
@@ -41,14 +42,10 @@ class Title(models.Model):
                             verbose_name="название произведения")
     description = models.TextField(max_length=250,
                                    verbose_name="описание", blank=True)
-    year = models.PositiveIntegerField(verbose_name='год выпуска произведения',
-                                       validators=[
-                                           MaxValueValidator(
-                                               datetime.datetime.now().year)]
-                                       )
+    year = models.PositiveIntegerField(verbose_name="год выпуска произведения",
+                                       validators=[validate_year], )
     genre = models.ManyToManyField(
-        Genre, blank=True, related_name="titles", verbose_name="Жанр"
-    )
+        Genre, blank=True, related_name="titles", verbose_name="Жанр")
     category = models.ForeignKey(
         Category,
         related_name="titles",
