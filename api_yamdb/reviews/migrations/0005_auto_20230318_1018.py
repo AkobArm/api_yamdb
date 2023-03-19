@@ -5,26 +5,40 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reviews', '0004_auto_20230316_1702'),
+        ("reviews", "0004_auto_20230316_1702"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='review',
-            name='score',
-            field=models.PositiveSmallIntegerField(validators=[django.core.validators.MinValueValidator(1, message='Оценка не может быть меньше 1'), django.core.validators.MaxValueValidator(10, message='Оценка не может быть больше 10')], verbose_name='Оценка'),
+            model_name="review",
+            name="score",
+            field=models.PositiveSmallIntegerField(
+                validators=[
+                    django.core.validators.MinValueValidator(
+                        1, message="Оценка не может быть меньше 1"
+                    ),
+                    django.core.validators.MaxValueValidator(
+                        10, message="Оценка не может быть больше 10"
+                    ),
+                ],
+                verbose_name="Оценка",
+            ),
         ),
         migrations.AlterField(
-            model_name='title',
-            name='description',
-            field=models.TextField(blank=True, default=1, max_length=250, verbose_name='описание'),
+            model_name="title",
+            name="description",
+            field=models.TextField(
+                blank=True, default=1, max_length=250, verbose_name="описание"
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='title',
-            name='year',
-            field=models.PositiveIntegerField(validators=[django.core.validators.MaxValueValidator(2023)], verbose_name='год выпуска произведения'),
+            model_name="title",
+            name="year",
+            field=models.PositiveIntegerField(
+                validators=[django.core.validators.MaxValueValidator(2023)],
+                verbose_name="год выпуска произведения",
+            ),
         ),
     ]

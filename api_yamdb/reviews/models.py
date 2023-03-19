@@ -10,10 +10,8 @@ SIM_NUMB: int = 15
 class Category(models.Model):
     """Модель категории произведения"""
 
-    name = models.CharField(max_length=200,
-                            verbose_name="категория произведения")
-    slug = models.SlugField(max_length=50,
-                            unique=True)
+    name = models.CharField(max_length=200, verbose_name="категория произведения")
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         verbose_name = "Категория"
@@ -38,14 +36,15 @@ class Genre(models.Model):
 class Title(models.Model):
     """Модель произведения"""
 
-    name = models.CharField(max_length=200,
-                            verbose_name="название произведения")
-    description = models.TextField(max_length=250,
-                                   verbose_name="описание", blank=True)
-    year = models.PositiveIntegerField(verbose_name="год выпуска произведения",
-                                       validators=[validate_year], )
+    name = models.CharField(max_length=200, verbose_name="название произведения")
+    description = models.TextField(max_length=250, verbose_name="описание", blank=True)
+    year = models.PositiveIntegerField(
+        verbose_name="год выпуска произведения",
+        validators=[validate_year],
+    )
     genre = models.ManyToManyField(
-        Genre, blank=True, related_name="titles", verbose_name="Жанр")
+        Genre, blank=True, related_name="titles", verbose_name="Жанр"
+    )
     category = models.ForeignKey(
         Category,
         related_name="titles",
@@ -70,8 +69,7 @@ class GenreTitle(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["title", "genre"], name="GenreTitle"),
+            models.UniqueConstraint(fields=["title", "genre"], name="GenreTitle"),
         ]
 
     def __str__(self):
@@ -95,8 +93,8 @@ class Review(models.Model):
     score = models.PositiveSmallIntegerField(
         "Оценка",
         validators=(
-            MinValueValidator(1, message='Оценка не может быть меньше 1'),
-            MaxValueValidator(10, message='Оценка не может быть больше 10'),
+            MinValueValidator(1, message="Оценка не может быть меньше 1"),
+            MaxValueValidator(10, message="Оценка не может быть больше 10"),
         ),
     )
     pub_date = models.DateTimeField(
@@ -135,8 +133,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name="comments",
     )
-    pub_date = models.DateTimeField(
-        "Дата публикации", auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True, db_index=True)
 
     def __str__(self):
         return self.text[:SIM_NUMB]
