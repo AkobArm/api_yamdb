@@ -193,19 +193,20 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def get_patch_me(self, request):
         user = get_object_or_404(User, username=self.request.user)
+        serializer_data = {'instance': user, 'data': request.data, 'partial': False}
+
         if request.method == "GET":
             serializer = MeSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
-            serializer = MeSerializer(user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PUT":
-            serializer = MeSerializer(user, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        if request.method == 'PATCH':
+            serializer_data['partial'] = True
+
+        serializer = MeSerializer(**serializer_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
